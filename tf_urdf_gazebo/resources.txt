@@ -1,0 +1,16 @@
+Udemy- 
+	Understand TFs, Design a custom robot with URDF, Simulate the robot in Gazebo - Your Next Step with ROS2.
+	https://www.udemy.com/course/ros2-tf-urdf-rviz-gazebo/learn/
+
+URDF Documentation: https://wiki.ros.org/urdf/XML/link
+
+URDF Collisions Docs: https://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model#Inertia
+
+Wiki - 
+
+List of moments of inertia:https://en.wikipedia.org/wiki/List_of_moments_of_inertia
+
+Gazebo models: https://app.gazebosim.org/fuel/models
+
+
+
