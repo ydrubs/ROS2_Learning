@@ -1,0 +1,84 @@
+
+<!-- 
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <! Optional: properties, materials, inertia helpers >
+  <! <xacro:include filename="common_properties.xacro"/> >
+
+  <xacro:macro name="arm" params="parent_link mount_xyz mount_rpy">
+
+    <! ALL arm links and joints go here >
+
+  </xacro:macro>
+
+</robot>
+-->
+
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="arm" params="parent_link mount_xyz mount_rpy">
+
+        <!-- Define links -->
+
+        <link name="arm_base_link">
+            <visual>
+                <geometry>
+                    <box size="0.1 0.1 0.02" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <material name="orange" />
+            </visual>
+        </link>
+
+
+        <link name="forearm_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="0.02" length="0.3" />
+                </geometry>
+                <origin xyz="0 0 0.15" rpy="0 0 0" />
+                <material name="yellow" />
+            </visual>
+        </link>
+
+        <link name="hand_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="0.02" length="0.3" />
+                </geometry>
+                <origin xyz="0 0 0.15" rpy="0 0 0" />
+                <material name="orange" />
+            </visual>
+        </link>
+        <!-- Define Joints -->
+
+        <!-- Fix the arm to the root so TF exists even before /joint_states -->
+        <joint name="base_to_arm" type="fixed">
+            <parent link="base_link"/>
+            <child link="arm_base_link"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </joint>
+
+        <joint name="arm_forearm_joint" type="revolute">
+            <parent link="arm_base_link" />
+            <child link="forearm_link" />
+            <origin xyz="0 0 0" />
+            <axis xyz="0 1 0" />
+
+        <limit lower="0.0" upper="${pi / 2.0}" effort="100" velocity="100"/>
+        </joint>
+
+        <joint name="forearm_hand_joint" type="revolute">
+            <parent link="forearm_link" />
+            <child link="hand_link" />
+            <origin xyz="0 0 0.3" />
+            <axis xyz="0 1 0" />
+
+        <limit lower="0.0" upper="${pi / 2.0}" effort="100" velocity="100"/>
+        </joint>
+
+    </xacro:macro>
+
+</robot>

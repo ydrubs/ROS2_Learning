@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot name="standalone_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Optional: shared materials + inertia helper macros -->
+  <xacro:include filename="common_properties.xacro"/>
+
+  <!-- The arm component -->
+  <xacro:include filename="_arm_my_attempt.xacro"/>
+
+  <!-- Root frame for standalone testing -->
+  <link name="base_link"/>
+
+  <!-- Instantiate the arm attached to base_link -->
+  <xacro:arm parent_link="base_link" mount_xyz="0 0 0" mount_rpy="0 0 0"/>
+
+</robot>

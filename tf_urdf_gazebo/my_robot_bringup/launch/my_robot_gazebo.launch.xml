@@ -1,0 +1,101 @@
+<launch>
+    <!--
+        This bringup launch file replaces the following manual commands by
+        starting and configuring all required components together:
+
+        1) Robot State Publisher (publishes TF from the robot description):
+        ros2 run robot_state_publisher robot_state_publisher \
+            ros-args -p robot_description:="$(xacro my_robot.urdf.xacro)"
+
+        2) Gazebo simulator startup:
+        ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="empty.sdf -r"
+
+        3) Spawn the robot into Gazebo using the robot_description topic:
+        ros2 run ros_gz_sim create -topic robot_description
+
+        4) RViz visualization with a predefined configuration:
+        ros2 run rviz2 rviz2 -d <workspace>/src/my_robot_description/rviz/rviz_config.rviz
+
+        This launch file composes these steps into a single, repeatable
+        bringup process using launch includes, arguments, and nodes.
+    -->
+
+
+    <!--
+        xacro is executed at launch time using the URDF/Xacro file path below.
+        The resulting URDF XML content is captured as a string and passed
+        into robot_state_publisher via the 'robot_description' parameter.
+        robot_state_publisher consumes the generated XML, not the file itself.
+    -->
+
+
+    <let name="urdf_path" value="$(find-pkg-share my_robot_description)/urdf/my_robot.urdf.xacro" />
+     <!-- <let name="urdf_path" value="$(find-pkg-share my_robot_description)/urdf/standalone_arm.urdf.xacro" /> -->
+
+    <let name="gazebo_config_path"
+         value="$(find-pkg-share my_robot_bringup)/config/gazebo_bridge.yaml" />
+
+
+    <!-- 
+        path to: os2 run rviz2 rviz2 -d <workspace>/src/my_robot_description/rviz/rviz_config.rviz
+    -->
+    <let name="rviz_config_path"
+         value="$(find-pkg-share my_robot_description)/rviz/rviz_config.rviz" />
+
+
+
+    <!--
+        The value parameter below resolves the full path to the Gazebo launch file provided by
+        the ros_gz_sim package. $(find-pkg-share ros_gz_sim) expands to the
+        package’s installed share directory, which is where ROS 2 expects
+        launch files to be installed (by convention under /launch).
+        This allows us to include and reuse an existing Gazebo launch file
+        instead of re-implementing Gazebo startup logic.
+    -->
+    <let name="gz_launch_path" value="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py" />
+
+
+    <!--
+        We include ros_gz_sim's existing Gazebo launch file instead of re-creating Gazebo startup logic.
+        This mirrors the manual command:
+            ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="empty.sdf -r"
+
+        The <arg> tag passes configuration into the included launch file (world + run/headless flags, etc.).
+    -->
+    <include file="$(var gz_launch_path)">
+        <arg name="gz_args" value="$(find-pkg-share my_robot_bringup)/worlds/test_world_gazebo.sdf -r"/>
+        <!-- <arg name="gz_args" value="empty.sdf -r"/> -->
+    </include>
+
+
+    <!--
+        Applies the CLI command:
+                   ros2 run robot_state_publisher robot_state_publisher \
+         ros-args -p robot_description:="$(xacro my_robot.urdf.xacro)" 
+            (note need to hypens before ros-args but can't show because comments here do not allow it)
+    -->
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" >
+        <param name="robot_description" 
+               value="$(command 'xacro $(var urdf_path)')" />
+    </node>
+
+    <!--
+        Applies: ros2 run ros_gz_sim create -topic robot_description
+    -->
+    <node pkg="ros_gz_sim" exec="create"
+                args="-topic robot_description" output="screen" />
+
+    <node pkg="ros_gz_bridge" exec="parameter_bridge">
+        <param name="config_file" value="$(var gazebo_config_path)" />
+    </node>
+
+    <node pkg="rviz2" exec="rviz2"
+          args="-d $(var rviz_config_path)"
+          output="screen" />
+
+    <!-- <node pkg="joint_state_publisher_gui" exec="joint_state_publisher_gui" /> -->
+
+</launch>
+
+
+
