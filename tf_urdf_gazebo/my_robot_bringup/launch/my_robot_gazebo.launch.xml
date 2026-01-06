@@ -63,8 +63,9 @@
         The <arg> tag passes configuration into the included launch file (world + run/headless flags, etc.).
     -->
     <include file="$(var gz_launch_path)">
-        <arg name="gz_args" value="$(find-pkg-share my_robot_bringup)/worlds/test_world_gazebo.sdf -r"/>
+        <!-- <arg name="gz_args" value="$(find-pkg-share my_robot_bringup)/worlds/test_world_gazebo.sdf -r"/> -->
         <!-- <arg name="gz_args" value="empty.sdf -r"/> -->
+        <arg name="gz_args" value="$(find-pkg-share my_robot_bringup)/worlds/maze_model_rs/maze_world.sdf -r"/>
     </include>
 
 
@@ -72,7 +73,7 @@
         Applies the CLI command:
                    ros2 run robot_state_publisher robot_state_publisher \
          ros-args -p robot_description:="$(xacro my_robot.urdf.xacro)" 
-            (note need to hypens before ros-args but can't show because comments here do not allow it)
+            (note need two hypens before ros-args but can't show because comments here do not allow it)
     -->
     <node pkg="robot_state_publisher" exec="robot_state_publisher" >
         <param name="robot_description" 

@@ -1,0 +1,66 @@
+1) why these plugins exist” 
+    Physics system (gz-sim-physics-system)
+
+        What it does: Steps the physics engine every tick.
+        Why it matters: Without stable physics stepping, movement, collisions, and time-based sensor updates can be inconsistent.
+
+
+    UserCommands system (gz-sim-user-commands-system)
+
+        What it does: Enables commands like spawn/move/delete entities from the GUI/tools.
+        Why it matters: Makes Gazebo behave “normally” during interactive use.
+
+
+    SceneBroadcaster system (gz-sim-scene-broadcaster-system)
+
+        What it does: Publishes the scene state (poses of models/links).
+        Why it matters: Many downstream systems assume the scene state is available. It can affect visualization and some bridging workflows.
+
+
+    Sensors system (gz-sim-sensors-system)
+
+        What it does: Updates and publishes simulated sensor data (LiDAR, camera, depth, etc.).
+        Why it matters (SLAM): Cartographer needs real-time /scan. If Sensors isn’t running correctly, SLAM fails even if the robot “drives fine.”
+
+
+    IMU system (gz-sim-imu-system)
+
+        What it does: Updates IMU sensors.
+        Why it matters: Optional, but including it prevents “IMU exists but never updates” issues.
+    
+
+2) Template usage checklist: “Make ANY world work”
+
+    Step A — Keep world name default
+        Many demo configs assume it, and it avoids topic/namespace surprises.
+
+
+    Step B — Always include the systems plugins
+        This is the #1 fix for “teleop works, SLAM doesn’t.”
+
+
+    Step C — Use one of these environment include strategies
+        Best (portable): model://...
+
+        Put your environment model folder somewhere like:
+
+            …/worlds/<model_name>/model.sdf
+
+        Add its parent directory to:
+
+            export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:/path/to/worlds
+
+
+        Include it with:
+
+            <include><uri>model://model_name</uri></include>
+
+        Fastest: 
+            file:///absolute/path/to.sdf
+            Works immediately, but any internal mesh/material paths must also resolve.
+
+    Step D — Confirm sensor flow    
+        After launching TB3 + Cartographer:
+            ros2 topic hz /scan
+            ros2 topic hz /map
+            If /scan is dead, Cartographer can’t map.

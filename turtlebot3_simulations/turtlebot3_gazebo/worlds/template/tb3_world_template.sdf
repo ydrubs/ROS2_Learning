@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!--
+    Canonical Gazebo Sim world template for TurtleBot3 + SLAM (Cartographer).
+
+    Goal:
+    - Consistent physics + sensor updates
+    - Predictable topic / TF behavior
+    - Works with TB3 launch patterns that assume demo-world defaults
+
+    Key idea:
+    - Start from TB3 demo world "plumbing"
+    - Swap in any environment (maze, warehouse, custom model)
+  -->
+
+  <!-- IMPORTANT: use the same world name as TB3 demo worlds -->
+  <world name="default">
+
+    <!-- =========================
+         VISUAL ENVIRONMENT (RViz unrelated)
+         ========================= -->
+    <scene>
+      <!-- Shadows off reduces “too dark / harsh shading” and is closer to demo worlds -->
+      <shadows>0</shadows>
+
+      <!-- Ambient light brightens everything uniformly -->
+      <ambient>0.6 0.6 0.6 1</ambient>
+
+      <!-- Background color for the Gazebo window only -->
+      <background>0.7 0.7 0.7 1</background>
+    </scene>
+
+    <!-- Optional: give Gazebo GUI a starting camera pose -->
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>0 -5 6 0 0.8 0</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+    <!-- =========================
+         PHYSICS (simulation timing & contact stability)
+         ========================= -->
+    <physics type="ode">
+      <!-- Higher update rate + small steps = more stable contacts and smoother sensor timing -->
+      <real_time_update_rate>1000.0</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>150</iters>
+          <sor>1.4</sor>
+          <use_dynamic_moi_rescaling>1</use_dynamic_moi_rescaling>
+        </solver>
+        <constraints>
+          <cfm>0.00001</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>2000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.01</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+
+    <!-- =========================
+         GAZEBO SIM SYSTEMS (the "plumbing")
+         These are the #1 reason custom worlds often "sort of work"
+         but SLAM / sensors / TF behave oddly.
+         ========================= -->
+
+    <!-- Physics system:
+         Ensures the simulator actually steps the physics engine. -->
+    <plugin filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics"/>
+
+    <!-- UserCommands system:
+         Lets the GUI and tools send commands (spawn/delete/move entities).
+         Often needed for normal GUI interactions and some workflows. -->
+    <plugin filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+
+    <!-- SceneBroadcaster system:
+         Publishes the simulation scene state (poses, visuals, etc.).
+         Many integrations (including ROS bridging patterns) assume this exists. -->
+    <plugin filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+
+    <!-- Sensors system:
+         This is CRITICAL for SLAM.
+         Without it, sensors might appear but won’t publish reliably.
+         Ogre2 render engine matches TB3 demo worlds. -->
+    <plugin filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- IMU system (optional but common):
+         Enables IMU sensors to update correctly if your robot has one.
+         Safe to include even if you don’t use it. -->
+    <plugin filename="gz-sim-imu-system"
+            name="gz::sim::systems::Imu"/>
+
+    <!-- =========================
+         BASE WORLD ELEMENTS
+         ========================= -->
+
+    <!-- Recommended: standard ground plane + sun from Fuel
+         (works well and avoids DIY lighting differences) -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
+    </include>
+
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun</uri>
+    </include>
+
+    <!-- =========================
+         ENVIRONMENT: SWAP THIS SECTION
+         ========================= -->
+
+    <!-- Option A: Include a Gazebo model by model:// name (best portable option)
+         Requires that your model is discoverable via GZ_SIM_RESOURCE_PATH. -->
+    <!--
+    <include>
+      <uri>model://maze_model_rs</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    -->
+
+    <!-- Option B: Include a local SDF file with file:// (quick and explicit)
+         Works even if you don’t want to manage resource paths.
+         But if the model references textures/meshes, those must be resolvable. -->
+    <include>
+      <uri>file:///ABSOLUTE/PATH/TO/YOUR/model_or_world.sdf</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <!-- Option C: Include a Fuel world or model URI -->
+    <!--
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/<Owner>/models/<ModelName></uri>
+    </include>
+    -->
+
+  </world>
+</sdf>
