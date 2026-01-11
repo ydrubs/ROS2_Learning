@@ -83,8 +83,9 @@
 
     <!-- Your maze model -->
 <include>
-  <uri>model://maze_model_rs</uri>
+  <uri>file:///home/ydrubs/ros2_ws_udemy/install/turtlebot3_gazebo/share/turtlebot3_gazebo/worlds/maze_model_rs/model.sdf</uri>
 </include>
+
 
 
   </world>

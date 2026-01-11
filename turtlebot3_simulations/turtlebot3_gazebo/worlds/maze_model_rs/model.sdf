@@ -11,7 +11,8 @@
       </visual>
       <collision name="collision">
         <geometry>
-          <mesh><uri>model://maze_model_rs/media/maze.dae</uri></mesh>
+          <mesh><uri>file:///home/ydrubs/ros2_ws_udemy/install/turtlebot3_gazebo/share/turtlebot3_gazebo/worlds/maze_model_rs/media/maze.dae</uri></mesh>
+          
         </geometry>
       </collision>
     </link>

@@ -31,19 +31,19 @@ def generate_launch_description():
     ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    # x_pose = LaunchConfiguration('x_pose', default='-2.0')
-    # y_pose = LaunchConfiguration('y_pose', default='-0.5')
+    x_pose = LaunchConfiguration('x_pose', default='-2.0')
+    y_pose = LaunchConfiguration('y_pose', default='-0.5')
 
     #Pose based on the map world. Use pose above for default house maze.
-    x_pose = LaunchConfiguration('x_pose', default='0') 
-    y_pose = LaunchConfiguration('y_pose', default='0')
+    # x_pose = LaunchConfiguration('x_pose', default='0') 
+    # y_pose = LaunchConfiguration('y_pose', default='0')
 
     world = os.path.join(
         get_package_share_directory('turtlebot3_gazebo'),
         'worlds', 
-        'maze_model_rs',
-        # 'turtlebot3_house.world' 
-        'maze_world.sdf'
+        # 'maze_model_rs',
+        'turtlebot3_house.world' 
+        # 'maze_world.sdf'
         # 'my_sample_world.sdf'
     )
 
